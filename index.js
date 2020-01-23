@@ -1,24 +1,51 @@
+// DOM elements
+const btns = document.querySelectorAll("button");
 const form = document.querySelector("form");
-const name = document.querySelector("#name");
-const cost = document.querySelector("#cost");
-const error = document.querySelector("#error");
+const formAct = document.querySelector("form span");
+const input = document.querySelector("input");
+const error = document.querySelector(".error");
 
+var activity = "cycling";
+
+btns.forEach(btn => {
+  btn.addEventListener("click", e => {
+    // get activity
+    activity = e.target.dataset.activity;
+
+    // remove and add active class
+    btns.forEach(btn => btn.classList.remove("active"));
+    e.target.classList.add("active");
+
+    // set id of input field
+    input.setAttribute("id", activity);
+
+    // set text of form span (the activity)
+    formAct.textContent = activity;
+
+    // call the update function
+    update(data);
+  });
+});
+
+// form submit
 form.addEventListener("submit", e => {
+  // prevent default action
   e.preventDefault();
 
-  if (name.value && cost.value) {
-    const item = {
-      name: name.value,
-      cost: parseInt(cost.value)
-    };
-    db.collection("expenses")
-      .add(item)
-      .then(res => {
+  const distance = parseInt(input.value);
+  if (distance) {
+    db.collection("activities")
+      .add({
+        distance,
+        activity,
+        date: new Date().toString()
+      })
+      .then(() => {
         error.textContent = "";
-        name.value = "";
-        cost.value = "";
-      });
+        input.value = "";
+      })
+      .catch(err => console.log(err));
   } else {
-    error.textContent = "Please enter values before submitting";
+    error.textContent = "Please enter a valid distance";
   }
 });
